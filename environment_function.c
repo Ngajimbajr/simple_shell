@@ -13,11 +13,11 @@ int printCurrentEnvironment(info_t *info)
 }
 
 /**
- * getEnvironmentVariable - Retrieves the value of a specific environment variable.
+ * getEnvironmentVariable - Retrieves value of specific environment variable.
  * @info: A pointer to the info_t structure containing environment information.
  * @name: The name of the environment variable to retrieve.
  *
- * Return: If the variable is found, returns its value; otherwise, returns NULL.
+ * Return: If the variable is found,returns its value; otherwise, returns NULL.
  */
 char *getEnvironmentVariable(info_t *info, const char *name)
 {
@@ -28,7 +28,7 @@ char *getEnvironmentVariable(info_t *info, const char *name)
 	{
 		value = startsWith(node->str, name);
 		if (value && *value)
-			return value;
+			return (value);
 		node = node->next;
 	}
 	return (NULL);
@@ -61,7 +61,7 @@ int setOrModifyEnvironmentVariable(info_t *info)
 int unsetEnvironmentVariable(info_t *info)
 {
 	int i;
-	
+
 	if (info->argc == 1)
 	{
 		printError("Too few arguments.\n");
