@@ -14,6 +14,7 @@ void initializeInfo(info_t *info)
 	info->argc = 0;
 }
 
+
 /**
  * setupInfo - Sets up information structure.
  * @info: Pointer to info_t structure to be initialized.
@@ -31,6 +32,7 @@ void setupInfo(info_t *info, char **av)
 		if (!info->argv)
 		{
 			info->argv = allocateMemory(sizeof(char *) * 2);
+
 			if (info->argv)
 			{
 				info->argv[0] = duplicateString(info->arg);
