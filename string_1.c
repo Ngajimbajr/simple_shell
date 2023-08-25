@@ -1,99 +1,107 @@
 #include "shell.h"
 
 /**
- * Copies the contents of one string to another.
+ * _strcpy - Copies a string to another
+ * @dest: The destination string
+ * @src: The source string
  *
- * @param dest The destination string.
- * @param src The source string.
- * @return Pointer to the destination string.
+ * Return: A pointer to the destination string
  */
-char *_strcpy(char *dest, char *src) {
-    int i = 0;
+char *_strcpy(char *dest, char *src)
+{
+	int i = 0;
 
-    // Check for self-copy or NULL source
-    if (dest == src || src == 0)
-        return dest;
+	/* Check for self-copy or NULL source*/
+	if (dest == src || src == 0)
+		return (dest);
 
-    // Copy characters until null-terminator
-    while (src[i]) {
-        dest[i] = src[i];
-        i++;
-    }
+	/*Copy characters until null-terminator*/
+	while (src[i])
+	{
+		dest[i] = src[i];
+		i++;
+	}
 
-    // Add null-terminator to the destination
-    dest[i] = 0;
-    return dest;
+	/* Add null-terminator to the destination*/
+	dest[i] = 0;
+	return (dest);
 }
 
 /**
- * Duplicates a given string.
+ * _strdup - Duplicates a string
+ * @str: The string to be duplicated
  *
- * @param str The string to duplicate.
- * @return Pointer to the duplicated string.
+ * Return: On success,pointer to duplicated string.On error,NULL is returned
  */
-char *_strdup(const char *str) {
-    int length = 0;
-    char *ret;
+char *_strdup(const char *str)
+{
+	int length = 0;
+	char *ret;
 
-    // Handle NULL input
-    if (str == NULL)
-        return NULL;
+	/* Handle NULL input*/
+	if (str == NULL)
+		return (NULL);
 
-    // Calculate the length of the string
-    while (*str++)
-        length++;
+	/* Calculate the length of the string*/
+	while (*str++)
+		length++;
 
-    // Allocate memory for the duplicated string
-    ret = malloc(sizeof(char) * (length + 1));
-    if (!ret)
-        return NULL;
+	/* Allocate memory for the duplicated string*/
+	ret = malloc(sizeof(char) * (length + 1));
+	if (!ret)
+		return (NULL);
 
-    // Copy characters in reverse order
-    for (length++; length--;)
-        ret[length] = *--str;
+	/* Copy characters in reverse order*/
+	for (length++; length--;)
+		ret[length] = *--str;
 
-    return ret;
+	return (ret);
 }
 
 /**
- * Prints a given string to the standard output.
+ * _puts - Prints a string to the standard output
+ * @str: The string to be printed
  *
- * @param str The string to be printed.
- * @return Nothing.
+ * Return: None
  */
-void _puts(char *str) {
-    int i = 0;
+void _puts(char *str)
+{
+	int i = 0;
 
-    // Check for NULL input
-    if (!str)
-        return;
+	/* Check for NULL input*/
+	if (!str)
+		return;
 
-    // Print characters until null-terminator
-    while (str[i] != '\0') {
-        _putchar(str[i]);
-        i++;
-    }
+	/* Print characters until null-terminator*/
+	while (str[i] != '\0')
+	{
+		_putchar(str[i]);
+		i++;
+	}
 }
 
 /**
- * Writes a character to the standard output.
+ * _putchar - Writes a character to the standard output
+ * @c: The character to be written
  *
- * @param c The character to print.
- * @return On success, 1. On error, -1 is returned, and errno is set appropriately.
+ * Return: On success, 1. On error, -1 is returned,errno is set appropriately
  */
-int _putchar(char c) {
-    static int i;
-    static char buf[WRITE_BUF_SIZE];
+int _putchar(char c)
+{
+	static int i;
+	static char buf[WRITE_BUF_SIZE];
 
-    // Flush buffer if necessary or if buffer size is exceeded
-    if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE) {
-        write(1, buf, i);
-        i = 0;
-    }
 
-    // Store character in buffer if not flushing
-    if (c != BUF_FLUSH)
-        buf[i++] = c;
+	/* Flush buffer if necessary or if buffer size is exceeded*/
+	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
+	{
+		write(1, buf, i);
+		i = 0;
+	}
 
-    return 1;
+	/* Store character in buffer if not flushing*/
+	if (c != BUF_FLUSH)
+		buf[i++] = c;
+
+	return (1);
 }
