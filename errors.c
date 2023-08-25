@@ -1,100 +1,85 @@
 #include "shell.h"
 
 /**
- * printString - Prints a null-terminated string
- * @str: The string to be printed
+ *_eputs - prints an input string
+ * @str: the string to be printed
  *
- * This function takes a null-terminated string and prints it using
- * the _putChar function.
+ * Return: Nothing
  */
-void printString(char *str)
+void _eputs(char *str)
 {
-	int index = 0;
+	int i = 0;
 
 	if (!str)
 		return;
-
-	while (str[index] != '\0')
+	while (str[i] != '\0')
 	{
-		printChar(str[index]);
-		index++;
+		_eputchar(str[i]);
+		i++;
 	}
 }
 
 /**
- * printChar - Writes a character to stderr
- * @c: The character to be printed
+ * _eputchar - writes the character c to stderr
+ * @c: The character to print
  *
- * This function writes a character to the stderr stream. It uses a buffer
- * to optimize writing and flushes the buffer when necessary.
- *
- * Return:On success, 1 On error, 1 is returned and errno is set appropriately.
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-int printChar(char c)
+int _eputchar(char c)
 {
-	static int currentIndex;
-	static char buffer[WRITE_BUF_SIZE];
+	static int i;
+	static char buf[WRITE_BUF_SIZE];
 
-	if (c == BUF_FLUSH || currentIndex >= WRITE_BUF_SIZE)
+	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
 	{
-		write(2, buffer, currentIndex);
-		currentIndex = 0;
+		write(2, buf, i);
+		i = 0;
 	}
-
 	if (c != BUF_FLUSH)
-		buffer[currentIndex++] = c;
-
+		buf[i++] = c;
 	return (1);
 }
 
 /**
- * printCharToFileDescriptor - Writes a character to the given file descriptor
- * @c: The character to be printed
- * @fd: The file descriptor to write to
+ * _putfd - writes the character c to given fd
+ * @c: The character to print
+ * @fd: The filedescriptor to write to
  *
- * This function writes a character to the provided file descriptor. It uses a
- * buffer to optimize writing and flushes the buffer when necessary.
- *
- * Return:On success, 1,On error,-1 is returned and errno is set appropriately.
+ * Return: On success 1.
+ * On error, -1 is returned, and errno is set appropriately.
  */
-int printCharToFileDescriptor(char c, int fd)
+int _putfd(char c, int fd)
 {
-	static int currentIndex;
-	static char buffer[WRITE_BUF_SIZE];
+	static int i;
+	static char buf[WRITE_BUF_SIZE];
 
-	if (c == BUF_FLUSH || currentIndex >= WRITE_BUF_SIZE)
+	if (c == BUF_FLUSH || i >= WRITE_BUF_SIZE)
 	{
-		write(fd, buffer, currentIndex);
-		currentIndex = 0;
+		write(fd, buf, i);
+		i = 0;
 	}
-
 	if (c != BUF_FLUSH)
-		buffer[currentIndex++] = c;
-
+		buf[i++] = c;
 	return (1);
 }
 
 /**
- * printStringToFileDescriptor - Prints a null-terminated string to a file.
- * @str: The string to be printed
- * @fd: The file descriptor to write to
+ *_putsfd - prints an input string
+ * @str: the string to be printed
+ * @fd: the filedescriptor to write to
  *
- * This function takes a null-terminated string and prints it to the provided
- * file descriptor using the printCharToFileDescriptor function.
- *
- * Return: The number of characters written.
+ * Return: the number of chars put
  */
-int printStringToFileDescriptor(char *str, int fd)
+int _putsfd(char *str, int fd)
 {
-	int charsWritten = 0;
+	int i = 0;
 
 	if (!str)
 		return (0);
-
 	while (*str)
 	{
-		charsWritten += printCharToFileDescriptor(*str++, fd);
+		i += _putfd(*str++, fd);
 	}
-
-	return (charsWritten);
+	return (i);
 }

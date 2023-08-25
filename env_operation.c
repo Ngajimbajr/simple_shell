@@ -1,28 +1,28 @@
 #include "shell.h"
 
 /**
- * **get_environ - Return a copy of environment variables as an array of string
- *
- * @info: Information structure.
- * Return: The environment variables as an array of strings.
+ * get_environ - returns the string array copy of our environ
+ * @info: Structure containing potential arguments. Used to maintain
+ *          constant function prototype.
+ * Return: Always 0
  */
 char **get_environ(info_t *info)
 {
-	/** If environ is not set or has changed, update it from the linked list*/
 	if (!info->environ || info->env_changed)
 	{
 		info->environ = list_to_strings(info->env);
 		info->env_changed = 0;
 	}
+
 	return (info->environ);
 }
 
 /**
- * _unsetenv - Removes an environment variable.
- *
- * @info: Information structure.
- * @var: The environment variable to be removed.
- * Return: 1 if the variable is deleted, 0 otherwise.
+ * _unsetenv - Remove an environment variable
+ * @info: Structure containing potential arguments. Used to maintain
+ *        constant function prototype.
+ *  Return: 1 on delete, 0 otherwise
+ * @var: the string env var property
  */
 int _unsetenv(info_t *info, char *var)
 {
@@ -33,7 +33,6 @@ int _unsetenv(info_t *info, char *var)
 	if (!node || !var)
 		return (0);
 
-	/** Iterate through the linked list and delete nodes matching var*/
 	while (node)
 	{
 		p = starts_with(node->str, var);
@@ -51,12 +50,13 @@ int _unsetenv(info_t *info, char *var)
 }
 
 /**
- * _setenv - Initializes new environment variable or modifies an existing one.
- *
- * @info: Information structure.
- * @var: The environment variable name.
- * @value: The environment variable value.
- * Return: Always 0.
+ * _setenv - Initialize a new environment variable,
+ *             or modify an existing one
+ * @info: Structure containing potential arguments. Used to maintain
+ *        constant function prototype.
+ * @var: the string env var property
+ * @value: the string env var value
+ *  Return: Always 0
  */
 int _setenv(info_t *info, char *var, char *value)
 {
@@ -73,26 +73,21 @@ int _setenv(info_t *info, char *var, char *value)
 	_strcpy(buf, var);
 	_strcat(buf, "=");
 	_strcat(buf, value);
-
 	node = info->env;
+	while (node)
 	{
-		while (node)
+		p = starts_with(node->str, var);
+		if (p && *p == '=')
 		{
-			p = starts_with(node->str, var);
-			if (p && *p == '=')
-			{
-				free(node->str);
-				node->str = buf;
-				info->env_changed = 1;
-				return (0);
-			}
-			node = node->next;
+			free(node->str);
+			node->str = buf;
+			info->env_changed = 1;
+			return (0);
 		}
-
-		/** Add a new node to the end of the linked list*/
-		add_node_end(&(info->env), buf, 0);
-		free(buf);
-		info->env_changed = 1;
-		return (0);
+		node = node->next;
 	}
+	add_node_end(&(info->env), buf, 0);
+	free(buf);
+	info->env_changed = 1;
+	return (0);
 }

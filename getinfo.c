@@ -1,12 +1,10 @@
 #include "shell.h"
 
 /**
- * initializeInfo - Function to initialize an info_t struct
- *
- * @info:struct address.
- * Return:void
+ * clear_info - initializes info_t struct
+ * @info: struct address
  */
-void initializeInfo(info_t *info)
+void clear_info(info_t *info)
 {
 	info->arg = NULL;
 	info->argv = NULL;
@@ -14,76 +12,63 @@ void initializeInfo(info_t *info)
 	info->argc = 0;
 }
 
-
 /**
- * setupInfo - Sets up information structure.
- * @info: Pointer to info_t structure to be initialized.
- * @av: Array of command line arguments.
+ * set_info - initializes info_t struct
+ * @info: struct address
+ * @av: argument vector
  */
-void setupInfo(info_t *info, char **av)
+void set_info(info_t *info, char **av)
 {
 	int i = 0;
 
 	info->fname = av[0];
-
 	if (info->arg)
 	{
-		info->argv = printString(info->arg, " \t");
+		info->argv = strtow(info->arg, " \t");
 		if (!info->argv)
 		{
-			info->argv = allocateMemory(sizeof(char *) * 2);
 
+			info->argv = malloc(sizeof(char *) * 2);
 			if (info->argv)
 			{
-				info->argv[0] = duplicateString(info->arg);
+				info->argv[0] = _strdup(info->arg);
 				info->argv[1] = NULL;
 			}
 		}
-
 		for (i = 0; info->argv && info->argv[i]; i++)
 			;
 		info->argc = i;
 
-		substituteAliases(info);
-		substituteVariables(info);
+		replace_alias(info);
+		replace_vars(info);
 	}
 }
 
 /**
- * releaseInfo - Releases all allocated resources.
- * @info: Pointer to info_t structure to be released.
- * @all: Whether to free all resources (1) or not (0).
+ * free_info - frees info_t struct fields
+ * @info: struct address
+ * @all: true if freeing all fields
  */
-void releaseInfo(info_t *info, int freeAll)
+void free_info(info_t *info, int all)
 {
-	freeMemory(info->argv);
+	ffree(info->argv);
 	info->argv = NULL;
 	info->path = NULL;
-
-	if (freeAll)
+	if (all)
 	{
-		if (!info->commandBuffer)
-			freeMemory(info->arg);
-
-		if (info->environ)
-			free_list(&(info->environ));
-
-		if (info->commandHistory)
-			free_list(&(info->commandHistory));
-
-		if (info->aliasList)
-			free_list(&(info->aliasList));
-
-		freeMemory(info->environVariables);
-		info->environVariables = NULL;
-
-		freeMemoryArray((void **)info->commandBuffer);
-
-		if (info->readFileDescriptor > 2)
-		{
-				close(info->readFileDescriptor);
-
-				printChar(BUF_FLUSH);
-		}
+		if (!info->cmd_buf)
+			free(info->arg);
+		if (info->env)
+			free_list(&(info->env));
+		if (info->history)
+			free_list(&(info->history));
+		if (info->alias)
+			free_list(&(info->alias));
+		ffree(info->environ);
+			info->environ = NULL;
+		bfree((void **)info->cmd_buf);
+		if (info->readfd > 2)
+			close(info->readfd);
+		_putchar(BUF_FLUSH);
 	}
 }
