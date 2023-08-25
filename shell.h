@@ -229,6 +229,7 @@ size_t count_nodes(const list_t *head);
 char **list_to_strings(list_t *);
 size_t print_linked_list(const list_t *);
 list_t *find_node_with_prefix(list_t *, char *, char );
+list_t *node_starts_with(list_t *, char *, char);
 ssize_t get_node_index(list_t *, list_t *);
 
 /* command_processing.c */

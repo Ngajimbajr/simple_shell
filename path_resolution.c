@@ -66,7 +66,7 @@ char *find_path(info_t *info, char *pathstr, char *cmd)
 		return (NULL);
 
 	/* Check if the command starts with "./" and is executable */
-	if ((_strlen(cmd) > 2) && starts_with(cmd, "./"))
+	if ((strlen(cmd) > 2) && node_starts_with(cmd, "./"))
 	{
 		if (is_cmd(info, cmd))
 			return (cmd);
@@ -79,11 +79,11 @@ char *find_path(info_t *info, char *pathstr, char *cmd)
 		{
 			path = dup_chars(pathstr, curr_pos, i);
 			if (!*path)
-				_strcat(path, cmd);
+				_strncat(path, cmd);
 			else
 			{
-				_strcat(path, "/");
-				_strcat(path, cmd);
+				_strncat(path, "/");
+				_strncat(path, cmd);
 			}
 
 			/* Check if the constructed path is an executable command */

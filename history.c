@@ -10,19 +10,19 @@ char *get_history_file(info_t *info)
 {
 	char *buf, *dir;
 	/** Get the home directory*/
-	dir = _getenv(info, "HOME=");
+	dir = _setenv(info, "HOME=");
 	if (!dir)
 		return (NULL);
 	/** Allocate memory for the history file path*/
-	buf = malloc(sizeof(char) * (_strlen(dir) + _strlen(HIST_FILE) + 2));
+	buf = malloc(sizeof(char) * (strlen(dir) + strlen(HIST_FILE) + 2));
 	if (!buf)
 		return (NULL);
 	buf[0] = 0;
 
 	/** Copy directory and history file path*/
 	_strcpy(buf, dir);
-	_strcat(buf, "/");
-	_strcat(buf, HIST_FILE);
+	_strncat(buf, "/");
+	_strncat(buf, HIST_FILE);
 
 	return (buf);
 }

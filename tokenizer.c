@@ -24,7 +24,7 @@ char **custom_strtow(char *str, char *d)
 	/* Count the number of words in the input string*/
 	for (i = 0; str[i] != '\0'; i++)
 	{
-		if (!is_delim(str[i], d) && (is_delim(str[i + 1], d) || !str[i + 1]))
+		if (!isDelim(str[i], d) && (isDelim(str[i + 1], d) || !str[i + 1]))
 			numwords++;
 	}
 
@@ -41,12 +41,12 @@ char **custom_strtow(char *str, char *d)
 	for (i = 0, j = 0; j < numwords; j++)
 	{
 		/* Skip leading delimiters*/
-		while (is_delim(str[i], d))
+		while (isDelim(str[i], d))
 			i++;
 
 		/* Count characters in the current word*/
 		k = 0;
-		while (!is_delim(str[i + k], d) && str[i + k])
+		while (!isDelim(str[i + k], d) && str[i + k])
 			k++;
 
 		/*Allocate memory for the word and copy characters*/
@@ -130,7 +130,7 @@ char **custom_strtow2(char *str, char d)
 		/* Copy characters from input string to the word*/
 		for (m = 0; m < k; m++)
 			s[j][m] = str[i++];
-		s[j][m] = 0
+		s[j][m] = 0;
 	}
 
 	s[j] = NULL;/* Null-terminate the array of strings*/

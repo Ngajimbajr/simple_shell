@@ -110,5 +110,5 @@ int manageAliases(info_t *info)
 		else
 			printAlias(node_starts_with(info->alias, info->argv[i], '='));
 	}
+	return (0);
 }
-
