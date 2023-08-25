@@ -163,7 +163,7 @@ int bfree(void **);
 int interactive(info_t *);
 int is_delim(char, char *);
 int _isalpha(int);
-int _atoi(char *);
+int stringToInteger(char *);
 
 /* errors_1.c */
 int _erratoi(char *);
