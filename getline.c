@@ -1,149 +1,178 @@
 #include "shell.h"
 
-// This function buffers chained commands.
-// It reads input and processes it line by line, detecting command chains.
+/**
+ * input_buf - Read input buffer from stdin
+ * @info: Pointer to info_t structure
+ * @buf: Pointer to the input buffer
+ * @len: Pointer to the buffer length
+ * Return: Number of characters read
+ */
 ssize_t input_buf(info_t *info, char **buf, size_t *len)
 {
-    ssize_t r = 0;
-    size_t len_p = 0;
+	ssize_t r = 0;
+	size_t len_p = 0;
 
-    // If there's nothing left in the buffer, fill it.
-    if (!*len) {
-        // Free the old buffer, if any.
-        free(*buf);
-        *buf = NULL;
+	/* If there's nothing left in the buffer, fill it.*/
+	if (!*len)
+	{
+		/* Free the old buffer, if any*/
+		free(*buf);
+		*buf = NULL;
 
-        // Set up signal handler for Ctrl+C.
-        signal(SIGINT, sigintHandler);
+		/* Set up signal handler for Ctrl+C*/
+		signal(SIGINT, sigintHandler);
 
-        // Read input line from stdin.
+		/* Read input line from stdin*/
 #if USE_GETLINE
-        r = getline(buf, &len_p, stdin);
+		r = getline(buf, &len_p, stdin);
 #else
-        r = _getline(info, buf, &len_p);
+		r = _getline(info, buf, &len_p);
 #endif
 
-        if (r > 0) {
-            // Remove trailing newline.
-            if ((*buf)[r - 1] == '\n') {
-                (*buf)[r - 1] = '\0';
-                r--;
-            }
+		if (r > 0)
+		{
+			/* Remove trailing newline*/
+			if ((*buf)[r - 1] == '\n')
+			{
+				(*buf)[r - 1] = '\0';
+				r--;
+			}
 
-            // Process the input line.
-            info->linecount_flag = 1;
-            remove_comments(*buf);
-            build_history_list(info, *buf, info->histcount++);
+			/* Process the input line*/
+			info->linecount_flag = 1;
+			remove_comments(*buf);
+			build_history_list(info, *buf, info->histcount++);
 
-            // Check if it's a command chain.
-            {
-                *len = r;
-                info->cmd_buf = buf;
-            }
-        }
-    }
-    return r;
+			/* Check if it's a command chain*/
+			{
+				*len = r;
+				info->cmd_buf = buf;
+			}
+		}
+	}
+	return (r);
 }
 
-// This function gets input from the user.
-// It handles command chaining and returns the processed input.
+/**
+ * get_input - Get input from stdin and process command chains
+ * @info: Pointer to info_t structure
+ * Return: Number of characters read or -1 on EOF
+ */
 ssize_t get_input(info_t *info)
 {
-    static char *buf; // Command chain buffer.
-    static size_t i, j, len;
-    ssize_t r = 0;
-    char **buf_p = &(info->arg), *p;
+	static char *buf;/* Command chain buffer*/
+	static size_t i, j, len;
+	ssize_t r = 0;
+	char **buf_p = &(info->arg), *p;
 
-    _putchar(BUF_FLUSH); // Flush buffer.
-    r = input_buf(info, &buf, &len);
-    if (r == -1) // EOF
-        return -1;
+	_putchar(BUF_FLUSH);/* Flush buffer*/
+	r = input_buf(info, &buf, &len);
+	if (r == -1)/* EOF*/
+		return (-1);
 
-    if (len) {
-        j = i;
-        p = buf + i;
+	if (len)
+	{
+		j = i;
+		p = buf + i;
 
-        check_chain(info, buf, &j, i, len);
+		check_chain(info, buf, &j, i, len);
 
-        while (j < len) {
-            if (is_chain(info, buf, &j))
-                break;
-            j++;
-        }
+		while (j < len)
+		{
+			if (is_chain(info, buf, &j))
+				break;
+			j++;
+		}
 
-        i = j + 1;
-        if (i >= len) {
-            i = len = 0;
-            info->cmd_buf_type = CMD_NORM;
-        }
+		i = j + 1;
+		if (i >= len)
+		{
+			i = len = 0;
+			info->cmd_buf_type = CMD_NORM;
+		}
 
-        *buf_p = p;
-        return _strlen(p);
-    }
+		*buf_p = p;
+		return (_strlen(p));
+	}
 
-    *buf_p = buf;
-    return r;
+	*buf_p = buf;
+	return (r);
 }
 
-// This function reads a buffer from a file descriptor.
+/**
+ * read_buf - Read from a buffer and update the index
+ * @info: Pointer to info_t structure
+ * @buf: Pointer to the buffer
+ * @i: Pointer to the current index in the buffer
+ * Return: Number of characters read or 0 if index is non-zero, or -1 on error
+ */
 ssize_t read_buf(info_t *info, char *buf, size_t *i)
 {
-    ssize_t r = 0;
+	ssize_t r = 0;
 
-    if (*i)
-        return 0;
+	if (*i)
+		return (0);
 
-    r = read(info->readfd, buf, READ_BUF_SIZE);
-    if (r >= 0)
-        *i = r;
+	r = read(info->readfd, buf, READ_BUF_SIZE);
+	if (r >= 0)
+		*i = r;
 
-    return r;
+	return (r);
 }
 
-// This function gets the next line of input from STDIN.
+/**
+ * _getline - Read a line from buffer with realloc
+ * @info: Pointer to info_t structure
+ * @ptr: Pointer to a pointer to store the line
+ * @length: Pointer to the length of the line
+ * Return: Number of characters read or -1 on error or EOF
+ */
 int _getline(info_t *info, char **ptr, size_t *length)
 {
-    static char buf[READ_BUF_SIZE];
-    static size_t i, len;
-    size_t k;
-    ssize_t r = 0, s = 0;
-    char *p = NULL, *new_p = NULL, *c;
+	static char buf[READ_BUF_SIZE];
+	static size_t i, len;
+	size_t k;
+	ssize_t r = 0, s = 0;
+	char *p = NULL, *new_p = NULL, *c;
 
-    p = *ptr;
-    if (p && length)
-        s = *length;
-    if (i == len)
-        i = len = 0;
+	p = *ptr;
+	if (p && length)
+		s = *length;
+	if (i == len)
+		i = len = 0;
 
-    r = read_buf(info, buf, &len);
-    if (r == -1 || (r == 0 && len == 0))
-        return -1;
+	r = read_buf(info, buf, &len);
+	if (r == -1 || (r == 0 && len == 0))
+		return (-1);
 
-    c = _strchr(buf + i, '\n');
-    k = c ? 1 + (unsigned int)(c - buf) : len;
-    new_p = _realloc(p, s, s ? s + k : k + 1);
-    if (!new_p)
-        return p ? (free(p), -1) : -1;
+	c = _strchr(buf + i, '\n');
+	k = c ? 1 + (unsigned int)(c - buf) : len;
+	new_p = _realloc(p, s, s ? s + k : k + 1);
+	if (!new_p)
+		return (p ? (free(p), -1) : -1);
 
-    if (s)
-        _strncat(new_p, buf + i, k - i);
-    else
-        _strncpy(new_p, buf + i, k - i + 1);
+	if (s)
+		_strncat(new_p, buf + i, k - i);
+	else
+		_strncpy(new_p, buf + i, k - i + 1);
 
-    s += k - i;
-    i = k;
-    p = new_p;
+	s += k - i;
+	i = k;
+	p = new_p;
 
-    if (length)
-        *length = s;
-    *ptr = p;
-    return s;
+	if (length)
+		*length = s;
+	*ptr = p;
+	return (s);
 }
 
-// Signal handler for Ctrl+C.
+/**
+ * sigintHandler - Handle SIGINT signal (Ctrl+C)
+ * @sig_num: Signal number (unused)
+ */
 void sigintHandler(__attribute__((unused)) int sig_num)
 {
-    _puts("\n");
-    _puts("$ ");
-    _putchar(BUF_FLUSH);
+	_puts("\n");
+	_puts("$ ");
+	_putchar(BUF_FLUSH);
 }

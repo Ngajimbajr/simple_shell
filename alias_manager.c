@@ -9,7 +9,7 @@
  */
 int displayHistory(info_t *info)
 {
-	print_list(info->history);
+	printAlias(info->history);
 	return (0);
 }
 
