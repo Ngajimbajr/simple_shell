@@ -57,7 +57,7 @@ int hsh(info_t *info, char **av)
 		exit(info->err_num);
 	}
 
-	return builtin_return;
+	return (builtin_return);
 }
 
 /**
@@ -77,11 +77,10 @@ int find_builtin(info_t *info)
 {
 	int i, built_in_ret = -1;
 
-	builtin_table builtintbl[] = 
-	{
+	builtin_table builtintbl[] = {
 		{"exit", _myexit},
 		{"env", _myenv},
-		{"help",_myhelp},
+		{"help", _myhelp},
 		{"history", _myhistory},
 		{"setenv", _mysetenv},
 		{"unsetenv", _myunsetenv},
